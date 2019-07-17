@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 
+namespace base64 {
 
 inline std::string get_base64_chars() {
     static std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -73,6 +74,8 @@ inline std::string from_base64(std::string const &data) {
     counter++;
   }
   return decoded;
+}
+
 }
 
 #endif // BASE_64_HPP
