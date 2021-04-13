@@ -19,7 +19,7 @@ inline std::string to_base64(std::string const &data) {
   const std::string base64_chars = get_base64_chars();
   std::string encoded;
   int offset = 0;
-  for (auto const &c : data) {
+  for (unsigned char c : data) {
     auto num_val = static_cast<unsigned int>(c);
     offset = 16 - counter % 3 * 8;
     bit_stream += num_val << offset;
@@ -53,7 +53,7 @@ inline std::string from_base64(std::string const &data) {
   std::string decoded;
   int offset = 0;
   const std::string base64_chars = get_base64_chars();
-  for (auto const &c : data) {
+  for (unsigned char c : data) {
     auto num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
       offset = 18 - counter % 4 * 6;
