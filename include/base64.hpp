@@ -7,10 +7,10 @@
 namespace base64 {
 
 inline std::string get_base64_chars() {
-    static std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                   "abcdefghijklmnopqrstuvwxyz"
-                                   "0123456789+/";
-    return base64_chars;
+  static std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                    "abcdefghijklmnopqrstuvwxyz"
+                                    "0123456789+/";
+  return base64_chars;
 }
 
 inline std::string to_base64(std::string const &data) {
@@ -76,6 +76,6 @@ inline std::string from_base64(std::string const &data) {
   return decoded;
 }
 
-}
+} // namespace base64
 
 #endif // BASE_64_HPP
