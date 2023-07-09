@@ -28,26 +28,26 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
     offset = 16 - counter % 3 * 8;
     bit_stream += num_val << offset;
     if (offset == 16) {
-      encoded.push_back(base64_chars.at(bit_stream >> 18 & 0x3f));
+      encoded.push_back(base64_chars[bit_stream >> 18 & 0x3f]);
     }
     if (offset == 8) {
-      encoded.push_back(base64_chars.at(bit_stream >> 12 & 0x3f));
+      encoded.push_back(base64_chars[bit_stream >> 12 & 0x3f]);
     }
     if (offset == 0 && counter != 3) {
-      encoded.push_back(base64_chars.at(bit_stream >> 6 & 0x3f));
-      encoded.push_back(base64_chars.at(bit_stream & 0x3f));
+      encoded.push_back(base64_chars[bit_stream >> 6 & 0x3f]);
+      encoded.push_back(base64_chars[bit_stream & 0x3f]);
       bit_stream = 0;
     }
     ++counter;
 		++begin;
   }
   if (offset == 16) {
-    encoded.push_back(base64_chars.at(bit_stream >> 12 & 0x3f));
+    encoded.push_back(base64_chars[bit_stream >> 12 & 0x3f]);
     encoded.push_back('=');
 		encoded.push_back('=');
   }
   if (offset == 8) {
-    encoded.push_back(base64_chars.at(bit_stream >> 6 & 0x3f));
+    encoded.push_back(base64_chars[bit_stream >> 6 & 0x3f]);
 		encoded.push_back('=');
   }
   return encoded;
