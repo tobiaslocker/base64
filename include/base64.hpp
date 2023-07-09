@@ -22,6 +22,7 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
   uint32_t bit_stream = 0;
   size_t offset = 0;
   OutputBuffer encoded;
+	encoded.reserve(static_cast<size_t>(1.5 * static_cast<double>(std::distance(begin, end))));
   while(begin != end) {
 		auto const num_val = static_cast<unsigned char>(*begin);
     offset = 16 - counter % 3 * 8;
@@ -66,6 +67,7 @@ inline OutputBuffer decode_into(std::string_view data) {
   size_t counter = 0;
   uint32_t bit_stream = 0;
   OutputBuffer decoded;
+	decoded.reserve(std::size(data));
   for (unsigned char c : data) {
     auto const num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
