@@ -12,10 +12,10 @@ inline constexpr std::string_view base64_chars{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                "0123456789+/"};
 
 inline std::string to_base64(std::string const &data) {
-  int counter = 0;
+  size_t counter = 0;
   uint32_t bit_stream = 0;
+  size_t offset = 0;
   std::string encoded;
-  int offset = 0;
   for (unsigned char c : data) {
     auto num_val = static_cast<unsigned int>(c);
     offset = 16 - counter % 3 * 8;
