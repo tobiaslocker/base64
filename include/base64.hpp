@@ -45,7 +45,7 @@ inline std::string to_base64(std::string const &data) {
 }
 
 template<class OutputBuffer>
-inline OutputBuffer decode_into(std::string const &data) {
+inline OutputBuffer decode_into(std::string_view data) {
 	using value_type = typename OutputBuffer::value_type;
 	static_assert(std::is_same_v<value_type, char>
 		|| std::is_same_v<value_type, unsigned char>
@@ -77,7 +77,7 @@ inline OutputBuffer decode_into(std::string const &data) {
   return decoded;
 }
 
-inline std::string from_base64(std::string const &data) {
+inline std::string from_base64(std::string_view data) {
 	return decode_into<std::string>(data);
 }
 
