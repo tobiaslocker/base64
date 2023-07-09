@@ -2,22 +2,18 @@
 #define BASE_64_HPP
 
 #include <algorithm>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace base64 {
 
-inline std::string get_base64_chars() {
-  static std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                    "abcdefghijklmnopqrstuvwxyz"
-                                    "0123456789+/";
-  return base64_chars;
-}
+inline constexpr std::string_view base64_chars{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                               "abcdefghijklmnopqrstuvwxyz"
+                                               "0123456789+/"};
 
 inline std::string to_base64(std::string const &data) {
   int counter = 0;
   uint32_t bit_stream = 0;
-  const std::string base64_chars = get_base64_chars();
   std::string encoded;
   int offset = 0;
   for (unsigned char c : data) {
@@ -52,7 +48,6 @@ inline std::string from_base64(std::string const &data) {
   size_t counter = 0;
   uint32_t bit_stream = 0;
   std::string decoded;
-  const std::string base64_chars = get_base64_chars();
   for (unsigned char c : data) {
     auto const num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
