@@ -44,23 +44,29 @@ inline std::string to_base64(std::string const &data) {
   return encoded;
 }
 
-inline std::string from_base64(std::string const &data) {
+template<class OutputBuffer>
+inline OutputBuffer decode_into(std::string const &data) {
+	using value_type = typename OutputBuffer::value_type;
+	static_assert(std::is_same_v<value_type, char>
+		|| std::is_same_v<value_type, unsigned char>
+		|| std::is_same_v<value_type, std::byte>);
+
   size_t counter = 0;
   uint32_t bit_stream = 0;
-  std::string decoded;
+  OutputBuffer decoded;
   for (unsigned char c : data) {
     auto const num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
       auto const offset = 18 - counter % 4 * 6;
       bit_stream += static_cast<uint32_t>(num_val) << offset;
       if (offset == 12) {
-        decoded += static_cast<char>(bit_stream >> 16 & 0xff);
+        decoded.push_back(static_cast<value_type>(bit_stream >> 16 & 0xff));
       }
       if (offset == 6) {
-        decoded += static_cast<char>(bit_stream >> 8 & 0xff);
+        decoded.push_back(static_cast<value_type>(bit_stream >> 8 & 0xff));
       }
       if (offset == 0 && counter != 4) {
-        decoded += static_cast<char>(bit_stream & 0xff);
+        decoded.push_back(static_cast<value_type>(bit_stream & 0xff));
         bit_stream = 0;
       }
     } else if (c != '=') {
@@ -69,6 +75,10 @@ inline std::string from_base64(std::string const &data) {
     counter++;
   }
   return decoded;
+}
+
+inline std::string from_base64(std::string const &data) {
+	return decode_into<std::string>(data);
 }
 
 } // namespace base64
