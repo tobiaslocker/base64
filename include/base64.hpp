@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <string>
+#include <stdexcept>
 
 namespace base64 {
 
@@ -68,7 +69,7 @@ inline std::string from_base64(std::string const &data) {
         bit_stream = 0;
       }
     } else if (c != '=') {
-      return std::string{};
+      throw std::runtime_error{"Invalid base64 encoded data"};
     }
     counter++;
   }
