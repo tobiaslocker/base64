@@ -57,7 +57,7 @@ inline std::string from_base64(std::string const &data) {
     auto num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
       offset = 18 - counter % 4 * 6;
-      bit_stream += num_val << offset;
+      bit_stream += static_cast<uint32_t>(num_val) << offset;
       if (offset == 12) {
         decoded += static_cast<char>(bit_stream >> 16 & 0xff);
       }
