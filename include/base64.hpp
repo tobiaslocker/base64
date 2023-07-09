@@ -12,37 +12,48 @@ inline constexpr std::string_view base64_chars{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                "abcdefghijklmnopqrstuvwxyz"
                                                "0123456789+/"};
 
-inline std::string to_base64(std::string const &data) {
+template<class OutputBuffer, class InputIterator>
+inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
+	static_assert(std::is_same_v<std::decay_t<decltype(*begin)>, char>
+		|| std::is_same_v<std::decay_t<decltype(*begin)>, unsigned char>
+		|| std::is_same_v<std::decay_t<decltype(*begin)>, std::byte>);
+
   size_t counter = 0;
   uint32_t bit_stream = 0;
   size_t offset = 0;
-  std::string encoded;
-  for (unsigned char c : data) {
-    auto num_val = static_cast<unsigned int>(c);
+  OutputBuffer encoded;
+  while(begin != end) {
+		auto const num_val = static_cast<unsigned char>(*begin);
     offset = 16 - counter % 3 * 8;
     bit_stream += num_val << offset;
     if (offset == 16) {
-      encoded += base64_chars.at(bit_stream >> 18 & 0x3f);
+      encoded.push_back(base64_chars.at(bit_stream >> 18 & 0x3f));
     }
     if (offset == 8) {
-      encoded += base64_chars.at(bit_stream >> 12 & 0x3f);
+      encoded.push_back(base64_chars.at(bit_stream >> 12 & 0x3f));
     }
     if (offset == 0 && counter != 3) {
-      encoded += base64_chars.at(bit_stream >> 6 & 0x3f);
-      encoded += base64_chars.at(bit_stream & 0x3f);
+      encoded.push_back(base64_chars.at(bit_stream >> 6 & 0x3f));
+      encoded.push_back(base64_chars.at(bit_stream & 0x3f));
       bit_stream = 0;
     }
-    counter++;
+    ++counter;
+		++begin;
   }
   if (offset == 16) {
-    encoded += base64_chars.at(bit_stream >> 12 & 0x3f);
-    encoded += "==";
+    encoded.push_back(base64_chars.at(bit_stream >> 12 & 0x3f));
+    encoded.push_back('=');
+		encoded.push_back('=');
   }
   if (offset == 8) {
-    encoded += base64_chars.at(bit_stream >> 6 & 0x3f);
-    encoded += '=';
+    encoded.push_back(base64_chars.at(bit_stream >> 6 & 0x3f));
+		encoded.push_back('=');
   }
   return encoded;
+}
+
+inline std::string to_base64(std::string const &data) {
+	return encode_into<std::string>(std::begin(data), std::end(data));
 }
 
 template<class OutputBuffer>
