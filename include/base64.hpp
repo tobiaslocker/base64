@@ -52,7 +52,7 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
   return encoded;
 }
 
-inline std::string to_base64(std::string const &data) {
+inline std::string to_base64(std::string_view data) {
 	return encode_into<std::string>(std::begin(data), std::end(data));
 }
 
