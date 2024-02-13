@@ -1,4 +1,3 @@
-#!/bin/bash
-#clang-format -verbose -i -style=file src/*.cpp
-clang-format -verbose -i -style=file test/*.cpp
-clang-format -verbose -i -style=file include/*.hpp
+#!/usr/bin/env sh
+clang-format -style=Google -i include/*.hpp
+clang-format -style=Google -i test/*.cpp

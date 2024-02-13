@@ -1,10 +1,18 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
 project(base64)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(include)
+# Warnings compiler flags
+if(MSVC)
+  add_compile_options(/W4)
+else()
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 add_executable(roundtrip_test test/roundtrip_test.cpp)
-target_compile_options(roundtrip_test PRIVATE -Wall -Wextra -Woverflow -Wconversion)
-add_custom_command(TARGET roundtrip_test POST_BUILD COMMAND ./roundtrip_test WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(roundtrip_test PRIVATE include)
+
+enable_testing()
+add_test(NAME roundtrip_test COMMAND roundtrip_test)
