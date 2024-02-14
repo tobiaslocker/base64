@@ -6,7 +6,7 @@
 int main() {
   std::string original;
   for (int i = 0; i < 1024; i++) {
-    original += char(std::rand());
+    original += static_cast<char>(std::rand());
   }
 
   std::cout << "char is "

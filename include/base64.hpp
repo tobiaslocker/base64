@@ -1,5 +1,5 @@
-#ifndef BASE_64_HPP
-#define BASE_64_HPP
+#ifndef BASE64_HPP_
+#define BASE64_HPP_
 
 #include <algorithm>
 #include <stdexcept>
@@ -99,4 +99,4 @@ inline std::string from_base64(std::string_view data) {
 
 }  // namespace base64
 
-#endif  // BASE_64_HPP
+#endif  // BASE64_HPP_
