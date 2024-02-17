@@ -70,7 +70,17 @@ inline OutputBuffer decode_into(std::string_view data) {
   size_t counter = 0;
   uint32_t bit_stream = 0;
   OutputBuffer decoded;
-  decoded.reserve(std::size(data));
+  const size_t encoded_size = std::size(data);
+  if ((encoded_size % 4) != 0) {
+    throw std::runtime_error{
+        "Invalid base64 encoded data - Size not divisible by 4"};
+  }
+  const size_t numlasteqs = std::count(data.rbegin(), data.rbegin() + 4, '=');
+  if (numlasteqs > 2) {
+    throw std::runtime_error{
+        "Invalid base64 encoded data - Found more than 2 padding signs"};
+  }
+  decoded.reserve(encoded_size);
   for (std::string_view::value_type c : data) {
     auto const num_val = base64_chars.find(c);
     if (num_val != std::string::npos) {
@@ -87,7 +97,8 @@ inline OutputBuffer decode_into(std::string_view data) {
         bit_stream = 0;
       }
     } else if (c != '=') {
-      throw std::runtime_error{"Invalid base64 encoded data"};
+      throw std::runtime_error{
+          "Invalid base64 encoded data - Found invalid character"};
     }
     counter++;
   }
