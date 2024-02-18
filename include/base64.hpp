@@ -2,8 +2,10 @@
 #define BASE64_HPP_
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <stdexcept>
 #include <string>
 #include <string_view>
