@@ -8,18 +8,34 @@
 #include <string>
 #include <string_view>
 
+#if defined(__cpp_lib_bit_cast)
+#include <bit>  // For std::bit_cast.
+#endif
+
 namespace base64 {
 
-namespace {
+namespace detail {
 
-std::array<char, 64> constexpr encode_table{
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+#if defined(__cpp_lib_bit_cast)
+using std::bit_cast
+#else
+template <class To, class From>
+std::enable_if_t<sizeof(To) == sizeof(From) &&
+                     std::is_trivially_copyable_v<From> &&
+                     std::is_trivially_copyable_v<To>,
+                 To>
+bit_cast(const From& src) noexcept {
+  static_assert(std::is_trivially_constructible_v<To>,
+                "This implementation additionally requires "
+                "destination type to be trivially constructible");
 
-inline constexpr char padding_char{'='};
+  To dst;
+  std::memcpy(&dst, &src, sizeof(To));
+  return dst;
+}
+#endif
+
+    inline constexpr char padding_char{'='};
 
 std::array<std::uint8_t, 256> constexpr decode_table{
     0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -45,53 +61,93 @@ std::array<std::uint8_t, 256> constexpr decode_table{
     0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
     0x64, 0x64, 0x64, 0x64};
 
-}  // end anonymous namespace
+std::array<char, 256> constexpr encode_table_0 = {
+    'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'D', 'D', 'D',
+    'D', 'E', 'E', 'E', 'E', 'F', 'F', 'F', 'F', 'G', 'G', 'G', 'G', 'H', 'H',
+    'H', 'H', 'I', 'I', 'I', 'I', 'J', 'J', 'J', 'J', 'K', 'K', 'K', 'K', 'L',
+    'L', 'L', 'L', 'M', 'M', 'M', 'M', 'N', 'N', 'N', 'N', 'O', 'O', 'O', 'O',
+    'P', 'P', 'P', 'P', 'Q', 'Q', 'Q', 'Q', 'R', 'R', 'R', 'R', 'S', 'S', 'S',
+    'S', 'T', 'T', 'T', 'T', 'U', 'U', 'U', 'U', 'V', 'V', 'V', 'V', 'W', 'W',
+    'W', 'W', 'X', 'X', 'X', 'X', 'Y', 'Y', 'Y', 'Y', 'Z', 'Z', 'Z', 'Z', 'a',
+    'a', 'a', 'a', 'b', 'b', 'b', 'b', 'c', 'c', 'c', 'c', 'd', 'd', 'd', 'd',
+    'e', 'e', 'e', 'e', 'f', 'f', 'f', 'f', 'g', 'g', 'g', 'g', 'h', 'h', 'h',
+    'h', 'i', 'i', 'i', 'i', 'j', 'j', 'j', 'j', 'k', 'k', 'k', 'k', 'l', 'l',
+    'l', 'l', 'm', 'm', 'm', 'm', 'n', 'n', 'n', 'n', 'o', 'o', 'o', 'o', 'p',
+    'p', 'p', 'p', 'q', 'q', 'q', 'q', 'r', 'r', 'r', 'r', 's', 's', 's', 's',
+    't', 't', 't', 't', 'u', 'u', 'u', 'u', 'v', 'v', 'v', 'v', 'w', 'w', 'w',
+    'w', 'x', 'x', 'x', 'x', 'y', 'y', 'y', 'y', 'z', 'z', 'z', 'z', '0', '0',
+    '0', '0', '1', '1', '1', '1', '2', '2', '2', '2', '3', '3', '3', '3', '4',
+    '4', '4', '4', '5', '5', '5', '5', '6', '6', '6', '6', '7', '7', '7', '7',
+    '8', '8', '8', '8', '9', '9', '9', '9', '+', '+', '+', '+', '/', '/', '/',
+    '/'};
+
+std::array<char, 256> constexpr encode_table_1 = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+    't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', '+', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
+    '4', '5', '6', '7', '8', '9', '+', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+    'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+    'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', 'A', 'B', 'C',
+    'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+    'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
+    '/'};
+
+}  // namespace detail
 
 inline std::string to_base64(std::string_view binaryText) {
-  std::string encoded(
-      (binaryText.size() / 3 + (binaryText.size() % 3 > 0)) << 2, padding_char);
+  std::string encoded((binaryText.size() / 3 + (binaryText.size() % 3 > 0))
+                          << 2,
+                      detail::padding_char);
 
   const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&binaryText[0]);
   char* currEncoding = &encoded[0];
 
-  union {
-    uint32_t temp = 0;
-    struct {
-      uint32_t first : 6, second : 6, third : 6, fourth : 6;
-    } tempBytes;
-  } byteunion;
-
-  for (uint32_t i = binaryText.size() / 3; i;
-       --i, bytes += 3, currEncoding += 4) {
-    byteunion.temp = bytes[0] << 16 | bytes[1] << 8 | bytes[2];
-
-    currEncoding[0] = encode_table[byteunion.tempBytes.fourth];
-    currEncoding[1] = encode_table[byteunion.tempBytes.third];
-    currEncoding[2] = encode_table[byteunion.tempBytes.second];
-    currEncoding[3] = encode_table[byteunion.tempBytes.first];
+  for (uint32_t i = binaryText.size() / 3; i; --i) {
+    const uint8_t t1 = *bytes++;
+    const uint8_t t2 = *bytes++;
+    const uint8_t t3 = *bytes++;
+    *currEncoding++ = detail::encode_table_0[t1];
+    *currEncoding++ =
+        detail::encode_table_1[((t1 & 0x03) << 4) | ((t2 >> 4) & 0x0F)];
+    *currEncoding++ =
+        detail::encode_table_1[((t2 & 0x0F) << 2) | ((t3 >> 6) & 0x03)];
+    *currEncoding++ = detail::encode_table_1[t3];
   }
 
   switch (binaryText.size() % 3) {
+    case 0: {
+      break;
+    }
     case 1: {
-      byteunion.temp = bytes[0] << 16;
-
-      currEncoding[0] = encode_table[byteunion.tempBytes.fourth];
-      currEncoding[1] = encode_table[byteunion.tempBytes.third];
+      const uint8_t t1 = bytes[0];
+      *currEncoding++ = detail::encode_table_0[t1];
+      *currEncoding++ = detail::encode_table_1[(t1 & 0x03) << 4];
+      // *currEncoding++ = detail::padding_char;
+      // *currEncoding++ = detail::padding_char;
       break;
     }
     case 2: {
-      byteunion.temp = bytes[0] << 16 | bytes[1] << 8;
-
-      currEncoding[0] = encode_table[byteunion.tempBytes.fourth];
-      currEncoding[1] = encode_table[byteunion.tempBytes.third];
-      currEncoding[2] = encode_table[byteunion.tempBytes.second];
-    } break;
-  case 0: {
-    break;
-  }
-  default: {
-    throw std::runtime_error{"Invalid base64 encoded data"};
-  }
+      const uint8_t t1 = bytes[0];
+      const uint8_t t2 = bytes[1];
+      *currEncoding++ = detail::encode_table_0[t1];
+      *currEncoding++ =
+          detail::encode_table_1[((t1 & 0x03) << 4) | ((t2 >> 4) & 0x0F)];
+      *currEncoding++ = detail::encode_table_1[(t2 & 0x0F) << 2];
+      // *currEncoding++ = detail::padding_char;
+      break;
+    }
+    default: {
+      throw std::runtime_error{"Invalid base64 encoded data"};
+    }
   }
 
   return encoded;
@@ -122,53 +178,86 @@ inline std::string from_base64(std::string_view base64Text) {
         "Invalid base64 encoded data - Found more than 2 padding signs"};
   }
 
-  uint32_t numPadding = (*std::prev(base64Text.end(), 1) == padding_char) +
-                        (*std::prev(base64Text.end(), 2) == padding_char);
+  uint32_t numPadding =
+      (*std::prev(base64Text.end(), 1) == detail::padding_char) +
+      (*std::prev(base64Text.end(), 2) == detail::padding_char);
 
   std::string decoded((base64Text.size() * 3 >> 2) - numPadding, '.');
 
-  union {
-    uint32_t temp;
-    uint8_t tempBytes[4];
-  };
   const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&base64Text[0]);
   char* currDecoding = &decoded[0];
 
-  for (uint32_t i = (base64Text.size() >> 2) - (numPadding != 0); i;
-       --i, bytes += 4, currDecoding += 3) {
-    if (decode_table[bytes[0]] == 0x64 || decode_table[bytes[1]] == 0x64 ||
-        decode_table[bytes[2]] == 0x64 || decode_table[bytes[3]] == 0x64) {
+  for (uint32_t i = (base64Text.size() >> 2) - (numPadding != 0); i; --i) {
+    const uint8_t t1 = *bytes++;
+    const uint8_t t2 = *bytes++;
+    const uint8_t t3 = *bytes++;
+    const uint8_t t4 = *bytes++;
+
+    const uint8_t d1 = detail::decode_table[t1];
+    const uint8_t d2 = detail::decode_table[t2];
+    const uint8_t d3 = detail::decode_table[t3];
+    const uint8_t d4 = detail::decode_table[t4];
+
+    if (d1 == 0x64 || d2 == 0x64 || d3 == 0x64 || d4 == 0x64) {
       throw std::runtime_error{
           "Invalid base64 encoded data - Invalid character"};
     }
 
-    temp = decode_table[bytes[0]] << 18 | decode_table[bytes[1]] << 12 |
-           decode_table[bytes[2]] << 6 | decode_table[bytes[3]];
-    currDecoding[0] = static_cast<char>(tempBytes[2]);
-    currDecoding[1] = static_cast<char>(tempBytes[1]);
-    currDecoding[2] = static_cast<char>(tempBytes[0]);
+    const uint32_t temp = d1 << 18 | d2 << 12 | d3 << 6 | d4;
+    const std::array<char, 4> tempBytes =
+        detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
+    *currDecoding++ = tempBytes[2];
+    *currDecoding++ = tempBytes[1];
+    *currDecoding++ = tempBytes[0];
   }
 
   switch (numPadding) {
-  case 2: {
-      temp = decode_table[bytes[0]] << 18 | decode_table[bytes[1]] << 12;
-      currDecoding[0] = static_cast<char>(tempBytes[2]);
+    case 0: {
       break;
-  }
-  case 1: {
-      temp = decode_table[bytes[0]] << 18 | decode_table[bytes[1]] << 12 |
-             decode_table[bytes[2]] << 6;
-      currDecoding[0] = static_cast<char>(tempBytes[2]);
-      currDecoding[1] = static_cast<char>(tempBytes[1]);
+    }
+    case 1: {
+      const uint8_t t1 = *bytes++;
+      const uint8_t t2 = *bytes++;
+      const uint8_t t3 = *bytes++;
+
+      const uint8_t d1 = detail::decode_table[t1];
+      const uint8_t d2 = detail::decode_table[t2];
+      const uint8_t d3 = detail::decode_table[t3];
+
+      if (d1 == 0x64 || d2 == 0x64 || d3 == 0x64) {
+        throw std::runtime_error{
+            "Invalid base64 encoded data - Invalid character"};
+      }
+
+      const uint32_t temp = d1 << 18 | d2 << 12 | d3 << 6;
+      const std::array<char, 4> tempBytes =
+          detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
+      *currDecoding++ = tempBytes[2];
+      *currDecoding++ = tempBytes[1];
       break;
-  }
-  case 0: {
+    }
+    case 2: {
+      const uint8_t t1 = *bytes++;
+      const uint8_t t2 = *bytes++;
+
+      const uint8_t d1 = detail::decode_table[t1];
+      const uint8_t d2 = detail::decode_table[t2];
+
+      if (d1 == 0x64 || d2 == 0x64) {
+        throw std::runtime_error{
+            "Invalid base64 encoded data - Invalid character"};
+      }
+
+      const uint32_t temp = d1 << 18 | d2 << 12;
+      const std::array<char, 4> tempBytes =
+          detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
+      *currDecoding++ = tempBytes[2];
       break;
-  }
-  default: {
+    }
+    default: {
       throw std::runtime_error{
           "Invalid base64 encoded data - Invalid padding number"};
-  }
+    }
   }
 
   return decoded;
