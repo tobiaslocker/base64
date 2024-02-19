@@ -497,7 +497,7 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
   const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&*begin);
   char* currEncoding = reinterpret_cast<char*>(&encoded[0]);
 
-  for (uint32_t i = binarytextsize / 3; i; --i) {
+  for (size_t i = binarytextsize / 3; i; --i) {
     const uint8_t t1 = *bytes++;
     const uint8_t t2 = *bytes++;
     const uint8_t t3 = *bytes++;
@@ -577,7 +577,7 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
   const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&base64Text[0]);
   char* currDecoding = reinterpret_cast<char*>(&decoded[0]);
 
-  for (uint32_t i = (base64Text.size() >> 2) - (numPadding != 0); i; --i) {
+  for (size_t i = (base64Text.size() >> 2) - (numPadding != 0); i; --i) {
     const uint8_t t1 = *bytes++;
     const uint8_t t2 = *bytes++;
     const uint8_t t3 = *bytes++;
