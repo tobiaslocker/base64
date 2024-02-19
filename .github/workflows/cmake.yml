@@ -33,6 +33,7 @@ jobs:
            else
                 cmake -B ${{github.workspace}}/build -DUSE_ASAN=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} .
            fi
+      shell: bash
       
 
     - name: Build
