@@ -192,36 +192,36 @@ TEST(Base64Decode, DecodesEmptyString) {
 TEST(Base64Decode, DecodesZeroArray) {
   std::string const input{"AAAA"};
   std::vector<std::uint8_t> const expected{0x00, 0x00, 0x00};
-  auto const actual{base64::from_base64(input)};
+  auto const actual{base64::decode_into<std::vector<std::uint8_t>>(input)};
 
-  ASSERT_EQ(actual, std::string(expected.begin(), expected.end()));
+  ASSERT_EQ(actual, expected);
 }
 
 // NOLINTNEXTLINE
 TEST(Base64Decode, DecodesZeroArrayTwice) {
   std::string const input{"AAAAAAAA"};
   std::vector<std::uint8_t> const expected{0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  auto const actual{base64::from_base64(input)};
+  auto const actual{base64::decode_into<std::vector<std::uint8_t>>(input)};
 
-  ASSERT_EQ(actual, std::string(expected.begin(), expected.end()));
+  ASSERT_EQ(actual, expected);
 }
 
 // NOLINTNEXTLINE
 TEST(Base64Decode, DecodesZeroArrayOneByte) {
   std::string const input{"AA=="};
   std::vector<std::uint8_t> const expected{0x00};
-  auto const actual{base64::from_base64(input)};
+  auto const actual{base64::decode_into<std::vector<std::uint8_t>>(input)};
 
-  ASSERT_EQ(actual, std::string(expected.begin(), expected.end()));
+  ASSERT_EQ(actual, expected);
 }
 
 // NOLINTNEXTLINE
 TEST(Base64Decode, DecodesZeroArrayTwoBytes) {
   std::string const input{"AAA="};
   std::vector<std::uint8_t> const expected{0x00, 0x00};
-  auto const actual{base64::from_base64(input)};
+  auto const actual{base64::decode_into<std::vector<std::uint8_t>>(input)};
 
-  ASSERT_EQ(actual, std::string(expected.begin(), expected.end()));
+  ASSERT_EQ(actual, expected);
 }
 
 // NOLINTNEXTLINE
@@ -233,8 +233,8 @@ TEST(Base64Decode, DecodesQuickFox) {
       0x72, 0x6f, 0x77, 0x6e, 0x20, 0x66, 0x6f, 0x78, 0x20, 0x6a, 0x75,
       0x6d, 0x70, 0x73, 0x20, 0x6f, 0x76, 0x65, 0x72, 0x20, 0x74, 0x68,
       0x65, 0x20, 0x6c, 0x61, 0x7a, 0x79, 0x20, 0x64, 0x6f, 0x67};
-  auto const actual{base64::from_base64(input)};
-  ASSERT_EQ(actual, std::string(expected.begin(), expected.end()));
+  auto const actual{base64::decode_into<std::vector<std::uint8_t>>(input)};
+  ASSERT_EQ(actual, expected);
 }
 
 // NOLINTNEXTLINE
@@ -246,10 +246,9 @@ TEST(Base64RoundTripTests, AllPossibleBytes) {
 
   auto const encode_string = base64::encode_into<std::string>(
       begin(all_possible_bytes), end(all_possible_bytes));
-  auto const decoded_bytes = base64::from_base64(encode_string);
-  // ASSERT_TRUE(decoded_bytes);
-  ASSERT_EQ(std::string(all_possible_bytes.begin(), all_possible_bytes.end()),
-            decoded_bytes);
+  auto const decoded_bytes =
+      base64::decode_into<std::vector<std::uint8_t>>(encode_string);
+  ASSERT_EQ(all_possible_bytes, decoded_bytes);
 }
 
 // NOLINTNEXTLINE
@@ -294,10 +293,8 @@ TEST(Base64RoundTripTests, ExhaustiveTests) {
 
   for (auto const& b64_string : base64_strings) {
     auto const decoded = base64::from_base64(b64_string);
-    // ASSERT_TRUE(decoded);
 
-    auto const encoded_round_trip =
-        base64::encode_into<std::string>(begin(decoded), end(decoded));
+    auto const encoded_round_trip = base64::to_base64(decoded);
     ASSERT_EQ(encoded_round_trip, b64_string);
   }
 }
@@ -321,6 +318,126 @@ TEST(Base64OverloadTests, EncodesString1) {
   for (auto const& [input, expected] : test_cases) {
     auto const actual = base64::to_base64(input);
     ASSERT_EQ(actual, expected);
+  }
+}
+
+// NOLINTNEXTLINE
+TEST(Base64RoundTripTests, TypeMixTests) {
+  const std::string strinput{"Hello, World!"};
+  const std::string stroutput{"SGVsbG8sIFdvcmxkIQ=="};
+
+  typedef std::vector<std::uint8_t> u8vec_type;
+  const u8vec_type uvecinput(strinput.begin(), strinput.end());
+  const u8vec_type uvecoutput(stroutput.begin(), stroutput.end());
+
+  typedef std::vector<std::int8_t> s8vec_type;
+  const s8vec_type svecinput(strinput.begin(), strinput.end());
+  const s8vec_type svecoutput(stroutput.begin(), stroutput.end());
+
+  // str -> str
+  {
+    auto tmp1 =
+        base64::encode_into<std::string>(strinput.begin(), strinput.end());
+    ASSERT_EQ(tmp1, stroutput);
+    auto tmp2 =
+        base64::decode_into<std::string>(stroutput.begin(), stroutput.end());
+    ASSERT_EQ(tmp2, strinput);
+    auto tmp3 = base64::encode_into<std::string>(strinput);
+    ASSERT_EQ(tmp3, stroutput);
+    auto tmp4 = base64::decode_into<std::string>(stroutput);
+    ASSERT_EQ(tmp4, strinput);
+    auto tmp5 = base64::to_base64(strinput);
+    ASSERT_EQ(tmp5, stroutput);
+    auto tmp6 = base64::from_base64(stroutput);
+    ASSERT_EQ(tmp6, strinput);
+  }
+
+  // str -> u8
+  {
+    auto tmp1 =
+        base64::encode_into<u8vec_type>(strinput.begin(), strinput.end());
+    ASSERT_EQ(tmp1, uvecoutput);
+    auto tmp2 =
+        base64::decode_into<u8vec_type>(stroutput.begin(), stroutput.end());
+    ASSERT_EQ(tmp2, uvecinput);
+    auto tmp3 = base64::encode_into<u8vec_type>(strinput);
+    ASSERT_EQ(tmp3, uvecoutput);
+    auto tmp4 = base64::decode_into<u8vec_type>(stroutput);
+    ASSERT_EQ(tmp4, uvecinput);
+  }
+
+  // str -> s8
+  {
+    auto tmp1 =
+        base64::encode_into<s8vec_type>(strinput.begin(), strinput.end());
+    ASSERT_EQ(tmp1, svecoutput);
+    auto tmp2 =
+        base64::decode_into<s8vec_type>(stroutput.begin(), stroutput.end());
+    ASSERT_EQ(tmp2, svecinput);
+    auto tmp3 = base64::encode_into<s8vec_type>(strinput);
+    ASSERT_EQ(tmp3, svecoutput);
+    auto tmp4 = base64::decode_into<s8vec_type>(stroutput);
+    ASSERT_EQ(tmp4, svecinput);
+  }
+
+  // u8 -> str
+  {
+    auto tmp1 =
+        base64::encode_into<std::string>(uvecinput.begin(), uvecinput.end());
+    ASSERT_EQ(tmp1, stroutput);
+    auto tmp2 =
+        base64::decode_into<std::string>(uvecoutput.begin(), uvecoutput.end());
+    ASSERT_EQ(tmp2, strinput);
+  }
+
+  // u8 -> u8
+  {
+    auto tmp1 =
+        base64::encode_into<u8vec_type>(uvecinput.begin(), uvecinput.end());
+    ASSERT_EQ(tmp1, uvecoutput);
+    auto tmp2 =
+        base64::decode_into<u8vec_type>(uvecoutput.begin(), uvecoutput.end());
+    ASSERT_EQ(tmp2, uvecinput);
+  }
+
+  // u8 -> s8
+  {
+    auto tmp1 =
+        base64::encode_into<s8vec_type>(uvecinput.begin(), uvecinput.end());
+    ASSERT_EQ(tmp1, svecoutput);
+    auto tmp2 =
+        base64::decode_into<s8vec_type>(uvecoutput.begin(), uvecoutput.end());
+    ASSERT_EQ(tmp2, svecinput);
+  }
+
+  // s8 -> str
+  {
+    auto tmp1 =
+        base64::encode_into<std::string>(svecinput.begin(), svecinput.end());
+    ASSERT_EQ(tmp1, stroutput);
+    auto tmp2 =
+        base64::decode_into<std::string>(svecoutput.begin(), svecoutput.end());
+    ASSERT_EQ(tmp2, strinput);
+  }
+
+  // s8 -> u8
+  {
+    auto tmp1 =
+        base64::encode_into<u8vec_type>(svecinput.begin(), svecinput.end());
+    ASSERT_EQ(tmp1, uvecoutput);
+    auto tmp2 =
+        base64::decode_into<u8vec_type>(svecoutput.begin(), svecoutput.end());
+    ASSERT_EQ(tmp2, uvecinput);
+  }
+
+  // s8 -> s8
+  {
+    auto tmp1 =
+        base64::encode_into<s8vec_type>(svecinput.begin(), svecinput.end());
+    ASSERT_EQ(tmp1, svecoutput);
+    auto tmp2 =
+        base64::decode_into<s8vec_type>(svecoutput.begin(), svecoutput.end());
+    ASSERT_EQ(tmp2, svecinput);
   }
 }
 
