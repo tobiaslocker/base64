@@ -15,18 +15,18 @@ jobs:
     - uses: actions/checkout@v3
 
     - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        id: runcmd
-        with:
-          arch: s390x
-          distro: ubuntu_latest
-          install: |
-            apt-get update -q -y
-            apt-get -y install cmake
-            apt-get -y install make
-            apt-get -y install g++
-          run: |
-            lscpu | grep Endian
-            cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-            make -j
-            ctest --output-on-failure
+      name: Run commands
+      id: runcmd
+      with:
+        arch: s390x
+        distro: ubuntu_latest
+        install: |
+          apt-get update -q -y
+          apt-get -y install cmake
+          apt-get -y install make
+          apt-get -y install g++
+        run: |
+          lscpu | grep Endian
+          cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+          make -j
+          ctest --output-on-failure
