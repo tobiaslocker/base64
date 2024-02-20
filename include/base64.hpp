@@ -598,9 +598,16 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
     const std::array<char, 4> tempBytes =
         detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
 
+#if defined(__LITTLE_ENDIAN__)
     *currDecoding++ = tempBytes[0];
     *currDecoding++ = tempBytes[1];
     *currDecoding++ = tempBytes[2];
+#else
+    // TODO fix decoding table to avoid the #if here?
+    *currDecoding++ = tempBytes[1];
+    *currDecoding++ = tempBytes[2];
+    *currDecoding++ = tempBytes[3];
+#endif
   }
 
   switch (numPadding) {
@@ -625,8 +632,14 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
 
       const std::array<char, 4> tempBytes =
           detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
+#if defined(__LITTLE_ENDIAN__)
       *currDecoding++ = tempBytes[0];
       *currDecoding++ = tempBytes[1];
+#else
+      // TODO fix decoding table to avoid the #if here?
+      *currDecoding++ = tempBytes[1];
+      *currDecoding++ = tempBytes[2];
+#endif
       break;
     }
     case 2: {
@@ -645,7 +658,12 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
 
       const std::array<char, 4> tempBytes =
           detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
+#if defined(__LITTLE_ENDIAN__)
       *currDecoding++ = tempBytes[0];
+#else
+      // TODO fix decoding table to avoid the #if here?
+      *currDecoding++ = tempBytes[1];
+#endif
       break;
     }
     default: {

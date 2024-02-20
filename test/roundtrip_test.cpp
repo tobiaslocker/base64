@@ -12,6 +12,14 @@ int runtests() {
             << (std::is_signed<char>::value ? "signed" : "unsigned")
             << std::endl;
 
+  std::cout << "endianness is "
+#if defined(__LITTLE_ENDIAN__)
+            << "little endian"
+#else
+            << "big endian"
+#endif
+            << std::endl;
+
   for (auto& length : lengths) {
     std::string original;
     for (int i = 0; i < length; i++) {
