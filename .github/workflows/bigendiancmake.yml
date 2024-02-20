@@ -25,6 +25,7 @@ jobs:
           apt-get -y install cmake
           apt-get -y install make
           apt-get -y install g++
+          apt-get -y install git
         run: |
           lscpu | grep Endian
           cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
