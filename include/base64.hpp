@@ -251,6 +251,13 @@ std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+
+// TODO fix decoding tables to avoid the need for different indices in big
+// endian?
+inline constexpr size_t decidx0{0};
+inline constexpr size_t decidx1{1};
+inline constexpr size_t decidx2{2};
+
 #elif defined(__BIG_ENDIAN__)
 
 std::array<std::uint32_t, 256> constexpr decode_table_0 = {
@@ -433,6 +440,12 @@ std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
 
+// TODO fix decoding tables to avoid the need for different indices in big
+// endian?
+inline constexpr size_t decidx0{1};
+inline constexpr size_t decidx1{2};
+inline constexpr size_t decidx2{3};
+
 #endif
 
 std::array<char, 256> constexpr encode_table_0 = {
@@ -595,19 +608,15 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
           "Invalid base64 encoded data - Invalid character"};
     }
 
+    // Use bit_cast instead of union and type punning to avoid
+    // undefined behaviour risk:
+    // https://en.wikipedia.org/wiki/Type_punning#Use_of_union
     const std::array<char, 4> tempBytes =
         detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
 
-#if defined(__LITTLE_ENDIAN__)
-    *currDecoding++ = tempBytes[0];
-    *currDecoding++ = tempBytes[1];
-    *currDecoding++ = tempBytes[2];
-#else
-    // TODO fix decoding table to avoid the #if here?
-    *currDecoding++ = tempBytes[1];
-    *currDecoding++ = tempBytes[2];
-    *currDecoding++ = tempBytes[3];
-#endif
+    *currDecoding++ = tempBytes[detail::decidx0];
+    *currDecoding++ = tempBytes[detail::decidx1];
+    *currDecoding++ = tempBytes[detail::decidx2];
   }
 
   switch (numPadding) {
@@ -630,16 +639,13 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
             "Invalid base64 encoded data - Invalid character"};
       }
 
+      // Use bit_cast instead of union and type punning to avoid
+      // undefined behaviour risk:
+      // https://en.wikipedia.org/wiki/Type_punning#Use_of_union
       const std::array<char, 4> tempBytes =
           detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
-#if defined(__LITTLE_ENDIAN__)
-      *currDecoding++ = tempBytes[0];
-      *currDecoding++ = tempBytes[1];
-#else
-      // TODO fix decoding table to avoid the #if here?
-      *currDecoding++ = tempBytes[1];
-      *currDecoding++ = tempBytes[2];
-#endif
+      *currDecoding++ = tempBytes[detail::decidx0];
+      *currDecoding++ = tempBytes[detail::decidx1];
       break;
     }
     case 2: {
@@ -658,12 +664,7 @@ inline OutputBuffer decode_into(std::string_view base64Text) {
 
       const std::array<char, 4> tempBytes =
           detail::bit_cast<std::array<char, 4>, uint32_t>(temp);
-#if defined(__LITTLE_ENDIAN__)
-      *currDecoding++ = tempBytes[0];
-#else
-      // TODO fix decoding table to avoid the #if here?
-      *currDecoding++ = tempBytes[1];
-#endif
+      *currDecoding++ = tempBytes[detail::decidx0];
       break;
     }
     default: {
