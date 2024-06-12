@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #if defined(__cpp_lib_bit_cast)
 #include <bit>  // For std::bit_cast.
