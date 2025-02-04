@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "../include/base64.hpp"
 
@@ -181,7 +182,6 @@ TEST(Base64Decode, DecodesMissingIssueExample) {
 
 // NOLINTNEXTLINE
 TEST(Base64Decode, DecodesEmptyString) {
-  std::string const input{};
   std::string expected{};
   auto const actual{base64::from_base64("")};
 
