@@ -20,14 +20,14 @@ int main() {
 ## Notes
 This library relies on C++17 but will exploit some C++20 features if available (e.g. `bit_cast`).
 
-There are many implementations available and it may be worth looking at those. A benchmark of various c/c++ base64 implementations can be found at https://github.com/gaspardpetit/base64/
+There are many implementations available and it may be worth looking at those. A benchmark of various c/c++ base64 implementations can be found at https://github.com/gaspardpetit/base64/ with summary results at:
+- https://rawcdn.githack.com/gaspardpetit/base64/main/result/result.html (presented as `base64tl`)
 
 This implementation here adopts the approach of Nick Galbreath's `modp_b64` library also used by chromium (e.g.  https://github.com/chromium/chromium/tree/main/third_party/modp_b64 ) but offers it as a c++ single header file. This choice was based on the good computational performance of the underpinning algorithm. We also decided to avoid relying on a c++ `union` to perform type punning as this, while working in practice, is strictly speaking undefined behaviour in c++: https://en.wikipedia.org/wiki/Type_punning#Use_of_union
 
-Faster c/c++ implementations exist althrough these likely exploit simd / openmp or similar acceleration techniques:
+Faster c/c++ implementations exist although these do not come as a single header library and exploit simd / openmp or similar acceleration techniques:
 - https://github.com/aklomp/base64
-- https://github.com/lemire/fastbase64 (From a [blog post](https://lemire.me/blog/2018/01/17/ridiculously-fast-base64-encoding-and-decoding/) by the authors: "My understanding is that our good results have been integrated in [Klomp’s base64 library](https://github.com/aklomp/base64).")
-- Other implementations related to the one by lemire: https://github.com/WojciechMula/base64-avx512 and https://github.com/WojciechMula/base64simd
+- https://github.com/simdutf/simdutf
 - https://github.com/powturbo/Turbo-Base64 (Note that this is licensed under GPL 3.0)
 
 Many other C++ centric appraches exists although they seem to focus on readibility or genericity at the cost of performance, e.g.:
