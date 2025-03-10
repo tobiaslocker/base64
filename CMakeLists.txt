@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(base64)
 
+option(BASE64_ENABLE_TESTING "Build test files." ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -41,38 +43,42 @@ if(USE_ASAN)
   endif()
 endif()
 
-add_executable(roundtrip_test test/roundtrip_test.cpp)
-target_include_directories(roundtrip_test PRIVATE include)
+add_library(base64 INTERFACE)
+target_include_directories(base64 INTERFACE include)
 
-enable_testing()
-add_test(NAME roundtrip_test COMMAND roundtrip_test)
+if (BASE64_ENABLE_TESTING)
+  add_executable(roundtrip_test test/roundtrip_test.cpp)
+  target_link_libraries(roundtrip_test PRIVATE base64)
 
-# Add some more tests
-include(FetchContent)
-if(${CMAKE_CXX_BYTE_ORDER} MATCHES BIG_ENDIAN)
-  set(FETCHCONTENT_QUIET FALSE)
+  enable_testing()
+  add_test(NAME roundtrip_test COMMAND roundtrip_test)
+
+  # Add some more tests
+  include(FetchContent)
+  if(${CMAKE_CXX_BYTE_ORDER} MATCHES BIG_ENDIAN)
+    set(FETCHCONTENT_QUIET FALSE)
+  endif()
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        750d67d809700ae8fca6d610f7b41b71aa161808
+    GIT_PROGRESS   TRUE
+    SYSTEM
+  )
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+
+  set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")
+  set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")
+  set_target_properties(gmock PROPERTIES CXX_CLANG_TIDY "")
+  set_target_properties(gmock_main PROPERTIES CXX_CLANG_TIDY "")
+
+  add_executable(base64_tests test/base64_tests.cpp)
+  target_link_libraries(base64_tests PRIVATE base64)
+
+  target_link_libraries(base64_tests PRIVATE GTest::gtest GTest::gtest_main)
+
+  add_test(NAME base64_tests COMMAND base64_tests)
 endif()
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        750d67d809700ae8fca6d610f7b41b71aa161808
-  GIT_PROGRESS   TRUE
-  SYSTEM
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")
-set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")
-set_target_properties(gmock PROPERTIES CXX_CLANG_TIDY "")
-set_target_properties(gmock_main PROPERTIES CXX_CLANG_TIDY "")
-
-add_executable(base64_tests test/base64_tests.cpp)
-target_include_directories(base64_tests PRIVATE include)
-
-target_link_libraries(base64_tests PRIVATE GTest::gtest GTest::gtest_main)
-
-add_test(NAME base64_tests COMMAND base64_tests)
-
 
