@@ -61,7 +61,7 @@ if (BASE64_ENABLE_TESTING)
   FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        750d67d809700ae8fca6d610f7b41b71aa161808
+    GIT_TAG        b514bdc898e2951020cbdca1304b75f5950d1f59
     GIT_PROGRESS   TRUE
     SYSTEM
   )
@@ -76,9 +76,12 @@ if (BASE64_ENABLE_TESTING)
 
   add_executable(base64_tests test/base64_tests.cpp)
   target_link_libraries(base64_tests PRIVATE base64)
-
   target_link_libraries(base64_tests PRIVATE GTest::gtest GTest::gtest_main)
-
   add_test(NAME base64_tests COMMAND base64_tests)
+
+  add_executable(modp_b64_tests test/modp_b64_tests.cpp)
+  target_link_libraries(modp_b64_tests PRIVATE base64)
+  target_link_libraries(modp_b64_tests PRIVATE GTest::gtest GTest::gtest_main)
+  add_test(NAME modp_b64_tests COMMAND modp_b64_tests)
 endif()
 
