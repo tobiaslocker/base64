@@ -24,10 +24,9 @@ using std::bit_cast;
 #else
 template <class To, class From>
 std::enable_if_t<sizeof(To) == sizeof(From) &&
-                     std::is_trivially_copyable_v<From> &&
-                     std::is_trivially_copyable_v<To>,
-                 To>
-bit_cast(const From& src) noexcept {
+std::is_trivially_copyable_v<From> &&
+std::is_trivially_copyable_v<To>,
+To> bit_cast(const From& src) noexcept {
   static_assert(std::is_trivially_constructible_v<To>,
                 "This implementation additionally requires "
                 "destination type to be trivially constructible");
@@ -63,7 +62,8 @@ inline constexpr uint32_t bad_char{0x01FFFFFF};
     defined(__THUMBEL__) || defined(__AARCH64EL__) || defined(_MIPSEL) ||      \
     defined(__MIPSEL) || defined(__MIPSEL__) || defined(_M_IX86) ||            \
     defined(_M_X64) || defined(_M_IA64) || /* msvc for intel processors */     \
-    defined(_M_ARM) || defined(_M_ARM64) /* msvc code on arm executes in little endian mode */
+    defined(_M_ARM) ||                                                         \
+    defined(_M_ARM64) /* msvc code on arm executes in little endian mode */
 #define __LITTLE_ENDIAN__
 #endif
 #endif
@@ -116,7 +116,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_0 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_1 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -161,7 +162,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_1 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_2 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -206,7 +208,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_2 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -251,7 +254,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 // TODO fix decoding tables to avoid the need for different indices in big
 // endian?
@@ -304,7 +308,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_0 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_1 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -349,7 +354,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_1 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_2 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -394,7 +400,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_2 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
@@ -439,7 +446,8 @@ std::array<std::uint32_t, 256> constexpr decode_table_3 = {
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
     0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff,
-    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff};
+    0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff
+};
 
 // TODO fix decoding tables to avoid the need for different indices in big
 // endian?
@@ -467,7 +475,8 @@ std::array<char, 256> constexpr encode_table_0 = {
     '0', '0', '1', '1', '1', '1', '2', '2', '2', '2', '3', '3', '3', '3', '4',
     '4', '4', '4', '5', '5', '5', '5', '6', '6', '6', '6', '7', '7', '7', '7',
     '8', '8', '8', '8', '9', '9', '9', '9', '+', '+', '+', '+', '/', '/', '/',
-    '/'};
+    '/'
+};
 
 std::array<char, 256> constexpr encode_table_1 = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
@@ -487,7 +496,8 @@ std::array<char, 256> constexpr encode_table_1 = {
     'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
     'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
     'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
-    '/'};
+    '/'
+};
 
 }  // namespace detail
 
@@ -531,8 +541,6 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
       const uint8_t t1 = bytes[0];
       *currEncoding++ = detail::encode_table_0[t1];
       *currEncoding++ = detail::encode_table_1[(t1 & 0x03) << 4];
-      // *currEncoding++ = detail::padding_char;
-      // *currEncoding++ = detail::padding_char;
       break;
     }
     case 2: {
@@ -542,7 +550,6 @@ inline OutputBuffer encode_into(InputIterator begin, InputIterator end) {
       *currEncoding++ =
           detail::encode_table_1[((t1 & 0x03) << 4) | ((t2 >> 4) & 0x0F)];
       *currEncoding++ = detail::encode_table_1[(t2 & 0x0F) << 2];
-      // *currEncoding++ = detail::padding_char;
       break;
     }
     default: {
