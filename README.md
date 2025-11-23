@@ -1,36 +1,48 @@
 # base64
-A simple approach to convert strings from and to base64.
-Header only c++ library (single header).
+
+A simple, header-only C++17 library for Base64 encoding and decoding. Uses modern C++ features when available
+(e.g., `std::bit_cast` in C++20) while remaining portable and efficient.
+
+## Features
+
+- Header-only, single-file library  
+- Fast encoding/decoding using lookup tables  
+- Safe type punning using `std::bit_cast` (avoids undefined behavior with unions)  
+- Throws `std::runtime_error` for invalid Base64 input (size, padding, or characters)  
+
+## Platform Support
+
+- Compilers: GCC, Clang, MSVC  
+- Architectures: x86, x64, ARM, AArch64 (little-endian)  
+- Requires C++17 (C++20 features optional)  
 
 ## Usage
 
 ```cpp
-#include <iostream>
+#include <iostream>  
+#include "base64.hpp"  
 
-#include "base64.hpp"
+int main() {  
+    auto encoded = base64::to_base64("Hello, World!");  
+    std::cout << encoded << std::endl; // SGVsbG8sIFdvcmxkIQ==  
 
-int main() {
-  auto encoded_str =  base64::to_base64("Hello, World!");
-  std::cout << encoded_str << std::endl; // SGVsbG8sIFdvcmxkIQ==
-  auto decoded_str = base64::from_base64("SGVsbG8sIFdvcmxkIQ==");
-  std::cout << decoded_str << std::endl; // Hello, World!
+    auto decoded = base64::from_base64("SGVsbG8sIFdvcmxkIQ==");  
+    std::cout << decoded << std::endl; // Hello, World!  
 }
 ```
 
 ## Notes
-This library relies on C++17 but will exploit some C++20 features if available (e.g. `bit_cast`).
 
-There are many implementations available and it may be worth looking at those. A benchmark of various c/c++ base64 implementations can be found at https://github.com/gaspardpetit/base64/ with summary results at:
-- https://rawcdn.githack.com/gaspardpetit/base64/main/result/result.html (presented as `base64tl`)
+- Inspired by Nick Galbreath's modp_b64 (used by Chromium) for high performance  
+- Compatible with C++17; optionally uses C++20 features  
+- Avoids union-based type punning for safety  
+- Faster implementations exist using SIMD or multithreading but are not header-only  
 
-This implementation here adopts the approach of Nick Galbreath's `modp_b64` library also used by chromium (e.g.  https://github.com/chromium/chromium/tree/main/third_party/modp_b64 ) but offers it as a c++ single header file. This choice was based on the good computational performance of the underpinning algorithm. We also decided to avoid relying on a c++ `union` to perform type punning as this, while working in practice, is strictly speaking undefined behaviour in c++: https://en.wikipedia.org/wiki/Type_punning#Use_of_union
+## References
 
-Faster c/c++ implementations exist although these do not come as a single header library and exploit simd / openmp or similar acceleration techniques:
-- https://github.com/aklomp/base64
-- https://github.com/simdutf/simdutf
-- https://github.com/powturbo/Turbo-Base64 (Note that this is licensed under GPL 3.0)
-
-Many other C++ centric appraches exists although they seem to focus on readibility or genericity at the cost of performance, e.g.:
--  https://github.com/matheusgomes28/base64pp (C++20 library from which we borrowed the unit test code)
--  https://github.com/ReneNyffenegger/cpp-base64 (Implementation that works with older C++ versions)
--  https://github.com/azawadzki/base-n (more generic baseN such as N=16 and N=32)
+- Benchmark of C/C++ Base64 libraries: https://github.com/gaspardpetit/base64/  
+- Chromium modp_b64: https://github.com/chromium/chromium/tree/main/third_party/modp_b64  
+- SIMD/optimized alternatives:  
+  - https://github.com/aklomp/base64  
+  - https://github.com/simdutf/simdutf  
+  - https://github.com/powturbo/Turbo-Base64
